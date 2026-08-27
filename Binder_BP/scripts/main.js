@@ -5,7 +5,8 @@
  * Bedrock's scripting API cannot read the keyboard, so the menu is opened by:
  *   1) using (right-click) the custom item  dekrezz:binder
  *   2) double-tapping Sneak (Shift) within DOUBLE_TAP_TICKS
- *   3) /scriptevent dekrezz:binder
+ *   3) jumping JUMP_COMBO_COUNT times in a row (no /give needed)
+ *   4) /scriptevent dekrezz:binder
  */
 
 import {
@@ -19,6 +20,8 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 const PROP_BINDS = "binder:binds";
 const ITEM_ID = "dekrezz:binder";
 const DOUBLE_TAP_TICKS = 8;
+const JUMP_COMBO_COUNT = 7;
+const JUMP_COMBO_WINDOW_TICKS = 20; // max gap between two jumps of the combo
 const JUMP_STRENGTH = 0.65;
 
 const TYPES = ["command", "jump"];
@@ -190,25 +193,55 @@ world.afterEvents.itemUse.subscribe((event) => {
 });
 
 const lastSneakTick = new Map();
+const jumpCombo = new Map(); // player id -> { count, tick }
 
 if (world.afterEvents.playerButtonInput === undefined) {
-  console.warn("Binder: playerButtonInput is unavailable in this version — double-Shift trigger disabled");
+  console.warn("Binder: playerButtonInput is unavailable in this version — Shift and jump triggers disabled");
 } else {
   world.afterEvents.playerButtonInput.subscribe((event) => {
-    if (event.button !== InputButton.Sneak) return;
     if (event.newButtonState !== ButtonState.Pressed) return;
 
-    const id = event.player.id;
+    const player = event.player;
+    const id = player.id;
     const now = system.currentTick;
-    const prev = lastSneakTick.get(id);
-    if (prev !== undefined && now - prev <= DOUBLE_TAP_TICKS) {
-      lastSneakTick.delete(id);
-      requestMenu(event.player);
+
+    if (event.button === InputButton.Sneak) {
+      const prev = lastSneakTick.get(id);
+      if (prev !== undefined && now - prev <= DOUBLE_TAP_TICKS) {
+        lastSneakTick.delete(id);
+        requestMenu(player);
+        return;
+      }
+      lastSneakTick.set(id, now);
       return;
     }
-    lastSneakTick.set(id, now);
+
+    if (event.button === InputButton.Jump) {
+      const state = jumpCombo.get(id);
+      const count =
+        state !== undefined && now - state.tick <= JUMP_COMBO_WINDOW_TICKS ? state.count + 1 : 1;
+
+      if (count >= JUMP_COMBO_COUNT) {
+        jumpCombo.delete(id);
+        requestMenu(player);
+        return;
+      }
+
+      jumpCombo.set(id, { count, tick: now });
+      // Nudge the player from halfway through the combo so it never fires unnoticed.
+      if (count >= Math.ceil(JUMP_COMBO_COUNT / 2)) {
+        player.onScreenDisplay.setActionBar(
+          `§6Binder §7${count}/${JUMP_COMBO_COUNT}`
+        );
+      }
+    }
   });
 }
+
+world.afterEvents.playerLeave.subscribe((event) => {
+  lastSneakTick.delete(event.playerId);
+  jumpCombo.delete(event.playerId);
+});
 
 system.afterEvents.scriptEventReceive.subscribe((event) => {
   if (event.id !== "dekrezz:binder") return;
@@ -220,6 +253,6 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
 world.afterEvents.playerSpawn.subscribe((event) => {
   if (!event.initialSpawn) return;
   event.player.sendMessage(
-    "§6Binder §7by dekrezz§r — open with the Binder item, double-Shift, or /scriptevent dekrezz:binder"
+    `§6Binder §7by dekrezz§r — open it by jumping ${JUMP_COMBO_COUNT}x in a row, double-tapping Shift, using the Binder item, or /scriptevent dekrezz:binder`
   );
 });
