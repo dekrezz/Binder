@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Binder RP",
+    "description": "Binder — on-screen keybinder. by dekrezz",
+    "uuid": "1bedf410-47cf-4422-aea2-0b0efe7fb33c",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 0]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "bd30afac-187a-4312-a312-8ee37fe087d7",
+      "version": [1, 0, 0]
+    }
+  ]
+}
