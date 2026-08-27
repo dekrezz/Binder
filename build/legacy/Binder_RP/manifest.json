@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Binder RP (legacy API 1.x)",
+    "description": "Binder — on-screen keybinder. by dekrezz",
+    "uuid": "3c1a77d2-9e4b-4a11-8f52-11c0aa77b904",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 20, 0]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "3c1a77d2-9e4b-4a11-8f52-11c0aa77b905",
+      "version": [1, 0, 0]
+    }
+  ]
+}

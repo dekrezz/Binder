@@ -141,12 +141,10 @@ function openEditor(player, binds, index) {
 
   const form = new ModalFormData()
     .title(isNew ? "Binder — new bind" : "Binder — edit bind")
-    .textField("Button name", "e.g. Day", { defaultValue: bind.name })
-    .dropdown("Action", TYPE_LABELS, { defaultValueIndex: typeIndex })
-    .textField("Command (several: separate with ;)", "/time set day", {
-      defaultValue: bind.value,
-    });
-  if (!isNew) form.toggle("Delete this bind", { defaultValue: false });
+    .textField("Button name", "e.g. Day", bind.name)
+    .dropdown("Action", TYPE_LABELS, typeIndex)
+    .textField("Command (several: separate with ;)", "/time set day", bind.value);
+  if (!isNew) form.toggle("Delete this bind", false);
 
   form.show(player).then((res) => {
     if (res.canceled) return;
@@ -244,11 +242,11 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
   requestMenu(source);
 });
 
-console.warn("Binder 1.0.2 loaded");
+console.warn("Binder 1.0.2 loaded (legacy API 1.x)");
 
 world.afterEvents.playerSpawn.subscribe((event) => {
   if (!event.initialSpawn) return;
   event.player.sendMessage(
-    `§6Binder 1.0.2 §7by dekrezz§r — open it by jumping ${JUMP_COMBO_COUNT}x in a row, double-tapping Shift, using the Binder item, or /scriptevent dekrezz:binder`
+    `§6Binder 1.0.2 (legacy) §7by dekrezz§r — open it by jumping ${JUMP_COMBO_COUNT}x in a row, double-tapping Shift, using the Binder item, or /scriptevent dekrezz:binder`
   );
 });

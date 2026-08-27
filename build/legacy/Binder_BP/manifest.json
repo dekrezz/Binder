@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Binder BP (legacy API 1.x)",
+    "description": "Binder — on-screen keybinder. by dekrezz",
+    "uuid": "3c1a77d2-9e4b-4a11-8f52-11c0aa77b901",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 20, 0]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "3c1a77d2-9e4b-4a11-8f52-11c0aa77b902",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "3c1a77d2-9e4b-4a11-8f52-11c0aa77b903",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    { "module_name": "@minecraft/server", "version": "1.10.0" },
+    { "module_name": "@minecraft/server-ui", "version": "1.1.0" },
+    { "uuid": "3c1a77d2-9e4b-4a11-8f52-11c0aa77b904", "version": [1, 0, 0] }
+  ]
+}
